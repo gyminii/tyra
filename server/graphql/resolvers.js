@@ -1,6 +1,7 @@
 import { GraphQLScalarType } from "graphql";
-import sampleData from "../mock-data.js";
-import Task from "../models/Task.js";
+import TaskService from "../services/task/task-service.js";
+
+const taskService = new TaskService();
 
 const resolvers = {
 	Date: new GraphQLScalarType({
@@ -23,31 +24,13 @@ const resolvers = {
 		},
 	}),
 	Query: {
-		allTasks: async () => await Task.find({}),
-		getTask: (_, { ID }) => {
-			console.log("FETCHING EACH TASK", ID);
-			return "YOOO";
-		},
-		getTaskTitle: (_, { title }) => {
-			console.log("FETCHING EACH TASK", title);
-			return "YOOO";
-		},
+		allTasks: async () => taskService.getAllTasks(),
+		getTask: (_, { ID }) => taskService.getTaskById(ID),
+		getTaskTitle: (_, { title }) => taskService.getTaskByTitle(title),
 	},
 	Mutation: {
-		createTask: async (_, { task }) => {
-			try {
-				const newTask = new Task(task);
-				const response = await newTask.save();
-				return response;
-			} catch (error) {
-				throw new Error("Unable to create Task");
-			}
-		},
-		deleteTask: async (_, { ID }) => {
-			console.log("DELETE TASK CALLED");
-			const isDeleted = (await Task.deleteOne({ _id: ID })).deletedCount;
-			return isDeleted;
-		},
+		createTask: async (_, { task }) => taskService.createTask(task),
+		deleteTask: async (_, { ID }) => taskService.deleteTaskById(ID),
 	},
 };
 
