@@ -29,18 +29,13 @@ const Board = () => {
 			}
 		}
 	`;
-	const tasks = useGenerateList();
-	const { isDragging, listItems, handleDragging, handleUpdateList } =
-		useDragAndDrop(tasks);
 
 	const boardsArr = boards.map((status) => ({
 		title: status.toUpperCase().replace("-", " "),
 		value: status,
 	}));
 	const { loading, error, data } = useQuery(GET_TASKS);
-	// const subTasks = useMemo(() =>,[])
 	console.log(loading, error, data);
-	// ticket, column, user data
 
 	return (
 		<Box sx={{ width: "100%" }}>

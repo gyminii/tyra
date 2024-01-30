@@ -1,8 +1,11 @@
 import { GraphQLScalarType } from "graphql";
 import TaskService from "../services/task/task-service.js";
+import BoardService from "../services/board/board-service.js";
+import Handler from "../services/handler-service.js";
 
 const taskService = new TaskService();
-
+const boardService = new BoardService();
+const handler = new Handler();
 const resolvers = {
 	Date: new GraphQLScalarType({
 		name: "Date",
@@ -24,13 +27,23 @@ const resolvers = {
 		},
 	}),
 	Query: {
+		// Tasks
 		allTasks: async () => taskService.getAllTasks(),
-		getTask: (_, { ID }) => taskService.getTaskById(ID),
-		getTaskTitle: (_, { title }) => taskService.getTaskByTitle(title),
+		getTask: (_, { taskId }) => taskService.getTaskById({ taskId: taskId }),
+		//Boards
+		allBoards: async (_, { boardId }) =>
+			boardService.getAllBoards({ boardId: boardId }),
+		getBoard: (_, { boardId }) => boardService.getBoard({ boardId: boardId }),
 	},
 	Mutation: {
-		createTask: async (_, { task }) => taskService.createTask(task),
-		deleteTask: async (_, { ID }) => taskService.deleteTaskById(ID),
+		// Tasks
+		createTask: async (_, { task }) => taskService.createTask({ task: task }),
+		deleteTask: async (_, { taskId }) => taskService.deleteTaskById(taskId),
+		// Boards
+		createBoard: async (_, { board }) =>
+			boardService.createBoard({ board: board }),
+		deleteBoard: async (_, { boardId }) =>
+			handler.deleteBoard({ boardId: boardId }),
 	},
 };
 
