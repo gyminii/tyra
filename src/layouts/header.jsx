@@ -20,6 +20,8 @@ import {
 	Person,
 	Search,
 } from "@mui/icons-material";
+import Searchbar from "../common/searchbar.jsx";
+
 const Header = ({ open, handleNav }) => {
 	const theme = useTheme();
 	const lgUp = useResponsive("up", "lg");
@@ -30,11 +32,7 @@ const Header = ({ open, handleNav }) => {
 					<List />
 				</IconButton>
 			)}
-			<Box>
-				<IconButton>
-					<Search />
-				</IconButton>
-			</Box>
+			<Searchbar />
 			<Box sx={{ flexGrow: 1 }} />
 			<Stack direction="row" alignItems="center" spacing={1}>
 				<IconButton>

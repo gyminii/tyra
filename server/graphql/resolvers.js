@@ -29,19 +29,17 @@ const resolvers = {
 	Query: {
 		// Tasks
 		allTasks: async () => taskService.getAllTasks(),
-		getTask: (_, { taskId }) => taskService.getTaskById({ taskId: taskId }),
+		getTask: (_, { taskId }) => taskService.getTaskById(taskId),
 		//Boards
-		allBoards: async (_, { boardId }) =>
-			boardService.getAllBoards({ boardId: boardId }),
+		allBoards: async () => boardService.getAllBoards(),
 		getBoard: (_, { boardId }) => boardService.getBoard({ boardId: boardId }),
 	},
 	Mutation: {
 		// Tasks
-		createTask: async (_, { task }) => taskService.createTask({ task: task }),
+		createTask: async (_, { task }) => taskService.createTask(task),
 		deleteTask: async (_, { taskId }) => taskService.deleteTaskById(taskId),
 		// Boards
-		createBoard: async (_, { board }) =>
-			boardService.createBoard({ board: board }),
+		createBoard: async (_, { board }) => boardService.createBoard(board),
 		deleteBoard: async (_, { boardId }) =>
 			handler.deleteBoard({ boardId: boardId }),
 	},

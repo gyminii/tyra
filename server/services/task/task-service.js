@@ -16,9 +16,9 @@ class TaskService {
 	 * @param {*} param1
 	 * @returns returns a task by id
 	 */
-	getTaskById = async (_, { taskId }) => {
+	getTaskById = async (_, taskId) => {
 		try {
-			const task = await Task.findOne({ taskId: taskId });
+			const task = await Task.findOne(taskId);
 			return task;
 		} catch (error) {
 			throw error;
@@ -28,9 +28,9 @@ class TaskService {
 	 * @param {*} param1
 	 * @returns returns a list of tasks given a board.
 	 */
-	getTaskByBoard = async (_, { boardId }) => {
+	getTaskByBoard = async (_, boardId) => {
 		try {
-			const tasks = await Task.find({ board: boardId });
+			const tasks = await Task.find(boardId);
 			return tasks;
 		} catch (error) {
 			throw error;
@@ -56,9 +56,9 @@ class TaskService {
 	 * @param {*} param1
 	 * @returns taskIds
 	 */
-	deleteTaskById = async (_, { taskId }) => {
+	deleteTaskById = async (_, taskId) => {
 		try {
-			const isDeleted = (await Task.deleteOne({ taskId: taskId })).deletedCount;
+			const isDeleted = (await Task.deleteOne(taskId)).deletedCount;
 			return isDeleted;
 		} catch (error) {
 			throw error;

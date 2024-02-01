@@ -3,9 +3,10 @@ scalar Date
 # Graphql types
 # scalar date ID, String uuiv4, _id
 # CREATE INDEX
+#  ObjectID
 type Task {
   taskId: ID! 
-  title: String!
+  title: String
   board: ID
   dateCreated: Date
   dateModified: Date
@@ -15,7 +16,7 @@ type Task {
 
 type Board {
   boardId: ID!
-  title: String!
+  title: String
   description: String
   dateCreated: Date
   tasks: [Task]
@@ -44,6 +45,7 @@ type Query {
   # boards
   allBoards: [Board!]!
   getBoard(boardId: ID!): Board!
+
 
 }
 

@@ -17,25 +17,21 @@ import { Fullscreen, Schedule, StarBorder } from "@mui/icons-material";
 import useGenerateList from "../../../hooks/use-generate-list";
 import { useDragAndDrop } from "../../../hooks/use-drag-n-drop";
 import { gql, useQuery } from "@apollo/client";
+import { GET_TASKS } from "../../../graphql/task-queries";
+import { GET_ALL_TASKS } from "../../../graphql/board-queries";
 
 const boards = ["to-do", "in-progress", "in-review", "done"];
 //  MUST CONTAIN ID, BOARD FOR BOARD SWAP LOGIC
 
 const Board = () => {
-	const GET_TASKS = gql`
-		query tasks {
-			allTasks {
-				title
-			}
-		}
-	`;
-
 	const boardsArr = boards.map((status) => ({
 		title: status.toUpperCase().replace("-", " "),
 		value: status,
 	}));
+
 	const { loading, error, data } = useQuery(GET_TASKS);
-	console.log(loading, error, data);
+	const { data: boards2 } = useQuery(GET_ALL_TASKS);
+	console.log(data, boards2);
 
 	return (
 		<Box sx={{ width: "100%" }}>

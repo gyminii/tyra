@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
+// ObjectId
 const BoardSchema = new Schema({
 	boardId: {
 		type: Schema.Types.UUID,
@@ -13,10 +14,10 @@ const BoardSchema = new Schema({
 	description: String,
 	dateCreated: {
 		type: Date,
-		required: true,
 		default: Date.now,
 	},
-	// childern: []
+	// childern: [1,2,3,4,5] [5,2,3,4,1]
+	// [#saf897293#23]
 	tasks: [
 		{
 			type: Schema.Types.UUID,

@@ -15,9 +15,9 @@ class BoardService {
 	 * @param {*} param1
 	 * @returns returns a board by boardId
 	 */
-	getBoard = async (_, { boardId }) => {
+	getBoard = async (_, boardId) => {
 		try {
-			return await Board.findOne({ boardId: boardId });
+			return await Board.findOne(boardId);
 		} catch (error) {
 			throw error;
 		}
@@ -40,9 +40,9 @@ class BoardService {
 	 * @param {*} param1
 	 * @returns delete board by board id
 	 */
-	deleteBoard = async (_, { boardId }) => {
+	deleteBoard = async (_, boardId) => {
 		try {
-			const isDeleted = await Board.deleteOne({ boardId: boardId });
+			const isDeleted = await Board.deleteOne(boardId);
 			return isDeleted;
 		} catch (error) {
 			throw error;
