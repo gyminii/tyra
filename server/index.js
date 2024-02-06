@@ -3,8 +3,9 @@ import dotenv from "dotenv";
 import { connectDB } from "./db.js";
 
 import { startStandaloneServer } from "@apollo/server/standalone";
-import resolvers from "./graphql/resolvers.js";
-import typeDefs from "./graphql/typedefs.js";
+import typeDefs from "./typedefs.js";
+import resolvers from "./resolvers.js";
+
 // [type, type1, type2]
 dotenv.config();
 

@@ -44,6 +44,7 @@ class TaskService {
 	 * @returns returns response
 	 */
 	createTask = async (task) => {
+		console.log(task);
 		try {
 			const newTask = new Task(task);
 			const response = await newTask.save();

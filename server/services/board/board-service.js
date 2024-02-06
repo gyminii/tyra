@@ -7,6 +7,7 @@ class BoardService {
 	getAllBoards = async () => {
 		try {
 			return await Board.find({});
+			// put your code here
 		} catch (error) {
 			throw error;
 		}
@@ -17,7 +18,7 @@ class BoardService {
 	 */
 	getBoard = async (_, boardId) => {
 		try {
-			return await Board.findOne(boardId);
+			return await Board.findOne({ boardId: boardId });
 		} catch (error) {
 			throw error;
 		}

@@ -5,25 +5,27 @@ import Main from "../components/main";
 import Nav from "./nav";
 import Header from "./header";
 import { Outlet } from "react-router-dom";
+import { HEADER_HEIGHT } from "../theme/utils";
 
 const Home = ({ children }) => {
 	const [openNav, setOpenNav] = useState(false);
 	const handleNav = () => setOpenNav(!openNav);
+	
 	return (
 		<>
-			<Box
-				sx={{
-					minHeight: 1,
-					display: "flex",
-					flexDirection: { xs: "column", lg: "row" },
-				}}
-			>
-				{/* NAV */}
-				<Header handleNav={handleNav} open={openNav} />
-				{/* MAIN GOES HERE */}
-				<Nav handleNav={handleNav} open={openNav} />
-				<Main>{children}</Main>
-			</Box>
+		<Header handleNav={handleNav} open={openNav} />
+		<Box
+        flex={1}
+        overflow="hidden"
+        sx={{
+          pt: `${HEADER_HEIGHT * 1.3}px`,
+          minHeight: `calc(100vh - ${HEADER_HEIGHT * 1.3}px)`,
+          backgroundColor: "background.paper",
+        }}
+      >
+        {children}
+      </Box>
+			
 		</>
 	);
 };

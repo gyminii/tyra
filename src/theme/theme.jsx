@@ -1,25 +1,18 @@
 import { CssBaseline } from "@mui/material";
-import {
-	ThemeProvider as MuiThemeProvider,
-	createTheme,
-} from "@mui/material/styles";
-import { useMemo } from "react";
-import { palette } from "./palette";
-import { typography } from "./typography";
-import { overrides } from "./components";
-import { customShadows } from "./shadow";
+import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
+import { createTheme } from "./index";
+import { useColorMode } from "./settings";
 export const ThemeProvider = ({ children }) => {
-	const memoizedTheme = useMemo(() => ({
-		palette: palette(),
-		typography,
-		shape: { borderRadius: 8 },
-		customShadows: customShadows(),
-	}));
-	const theme = createTheme(memoizedTheme);
-	theme.components = overrides(theme);
+	const { color } = useColorMode();
+	const theme = createTheme({
+		colorPreset: "royalblue",
+		direction: "ltr",
+		paletteMode: color,
+		// layout,
+	});
 	return (
 		<MuiThemeProvider theme={theme}>
-			<CssBaseline enableColorScheme />
+			<CssBaseline />
 			{children}
 		</MuiThemeProvider>
 	);

@@ -8,13 +8,13 @@ import Home from "../layouts/home";
 import { Suspense, lazy } from "react";
 
 export const BoardComponent = lazy(() =>
-	import("../components/contents/board/board")
+	import("../components/contents/board")
 );
 export const OverviewComponent = lazy(() =>
-	import("../components/contents/overview/overview")
+	import("../components/contents/overview")
 );
 export const UserComponent = lazy(() =>
-	import("../components/contents/user/user")
+	import("../components/contents/user")
 );
 const routes = [
 	{

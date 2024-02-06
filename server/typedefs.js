@@ -7,11 +7,12 @@ scalar Date
 type Task {
   taskId: ID! 
   title: String
-  board: ID
+  boardId: ID
+  description: String
   dateCreated: Date
   dateModified: Date
   dueDate: Date
-  assignedTo: ID
+  # assignedTo: ID
 }
 
 type Board {
@@ -26,9 +27,9 @@ type Board {
 input TaskBody {
   taskId: ID!
   title: String!
-  board: String!
+  boardId: ID!
   dueDtate: Date
-  assignedTo: ID  
+  # assignedTo: ID  
 }
 input BoardBody {
   boardId: ID!
@@ -41,10 +42,10 @@ input BoardBody {
 type Query {
   # tasks
   allTasks: [Task!]!
-  getTask(taskId: ID!): Task!
+  getTask(taskId: ID!): Task
   # boards
   allBoards: [Board!]!
-  getBoard(boardId: ID!): Board!
+  getBoard(boardId: ID!): Board
 
 
 }
