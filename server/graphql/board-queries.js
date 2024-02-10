@@ -1,36 +1,86 @@
 import { gql } from "@apollo/client";
 
-export const GET_BOARDS = gql`
-	query getAllBoards {
-		allBoards {
-			boardId
+/**
+ * Create
+ */
+export const CREATE_BOARD = gql`
+	mutation CreateBoard(
+		$title: String!
+		$description: String
+		$dueDate: String
+	) {
+		createBoard(title: $title, description: $description, dueDate: $dueDate) {
+			_id
 			title
 			description
 			dateCreated
+			dueDate
+		}
+	}
+`;
+/**
+ * Get all boards
+ */
+export const GET_ALL_BOARDS = gql`
+	query GetAllBoards {
+		getAllBoards {
+			_id
+			title
+			description
+			dateCreated
+			dueDate
 			tasks {
-				taskId
+				_id
 				title
+				description
 				dateCreated
+				dueDate
+				isComplete
 			}
 		}
 	}
 `;
+/**
+ * get a single board
+ */
 export const GET_BOARD = gql`
-	query getBoard($boardId: ID!) {
-		getBoard(boardId: $boardId) {
-			boardId
+	query getBoard($_id: ID!) {
+		getBoard(_id: $_id) {
+			_id
 			title
 		}
 	}
 `;
-
-export const CREATE_BOARD = gql`
-	mutation createBoard($board: BoardBody!) {
-		createBoard(board: $board) {
-			boardId
+/**
+ * Update a board
+ */
+export const UPDATE_BOARD = gql`
+	mutation UpdateBoard(
+		$_id: ID!
+		$title: String
+		$description: String
+		$dueDate: String
+	) {
+		updateBoard(
+			_id: $_id
+			title: $title
+			description: $description
+			dueDate: $dueDate
+		) {
+			_id
 			title
 			description
-			dateCreated
+			dueDate
+		}
+	}
+`;
+/**
+ * Delete a board
+ */
+export const DELETE_BOARD = gql`
+	mutation DeleteBoard($_id: ID!) {
+		deleteBoard(_id: $_id) {
+			_id
 		}
 	}
 `;

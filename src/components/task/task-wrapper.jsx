@@ -17,7 +17,6 @@ const Task = forwardRef(({ task, dragging, ...props }, ref) => {
 	const [onMenuOpen, menuOpen] = useState(false);
 	const openMenu = () => menuOpen(true);
 	const closeMenu = () => menuOpen(false);
-
 	return (
 		<>
 			<Box key={taskId} ref={ref} {...props}>

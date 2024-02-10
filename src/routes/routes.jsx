@@ -13,9 +13,7 @@ export const BoardComponent = lazy(() =>
 export const OverviewComponent = lazy(() =>
 	import("../components/contents/overview")
 );
-export const UserComponent = lazy(() =>
-	import("../components/contents/user")
-);
+export const UserComponent = lazy(() => import("../components/contents/user"));
 const routes = [
 	{
 		element: (
@@ -26,8 +24,8 @@ const routes = [
 			</Home>
 		),
 		children: [
-			{ element: <OverviewComponent />, index: true },
-			{ path: "board", element: <BoardComponent /> },
+			{ element: <BoardComponent />, index: true },
+			// { path: "board", element: <BoardComponent /> },
 			{ path: "user", element: <UserComponent /> },
 		],
 	},

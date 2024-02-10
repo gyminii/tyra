@@ -1,8 +1,10 @@
+import { useMutation } from "@apollo/client";
+import { ErrorMessage } from "@hookform/error-message";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	Box,
 	Button,
 	Dialog,
-	DialogActions,
 	DialogContent,
 	DialogTitle,
 	FormControl,
@@ -13,17 +15,14 @@ import {
 	Typography,
 	useTheme,
 } from "@mui/material";
-import { zodResolver } from "@hookform/resolvers/zod";
 import React, { forwardRef, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { CREATE_BOARD_VALIDATION } from "../../validation/board-validation";
-import { ErrorMessage } from "@hookform/error-message";
+import toast from "react-hot-toast";
 import {
 	CREATE_BOARD,
-	GET_BOARDS,
+	GET_ALL_BOARDS,
 } from "../../../server/graphql/board-queries";
-import { useMutation, useQuery } from "@apollo/client";
-import { v4 as uuidv4 } from "uuid";
+import { CREATE_BOARD_VALIDATION } from "../../validation/board-validation";
 const Transition = forwardRef((props, ref) => (
 	<Slide direction="up" ref={ref} {...props} />
 ));
@@ -32,7 +31,7 @@ const CreateBoardDialog = (props) => {
 	const theme = useTheme();
 	const [createBoard, { loading, error, data: board }] =
 		useMutation(CREATE_BOARD);
-	const { refetch } = useQuery(GET_BOARDS);
+	console.count();
 	const {
 		control,
 		handleSubmit,
@@ -51,17 +50,15 @@ const CreateBoardDialog = (props) => {
 		try {
 			const response = await createBoard({
 				variables: {
-					board: {
-						...body,
-						boardId: uuidv4(),
-					},
+					...body,
 				},
+				refetchQueries: [{ query: GET_ALL_BOARDS }],
 			});
+			toast.success("Board created successfully.");
 			onClose();
-			refetch();
 			return response;
 		} catch (error) {
-			console.log(error);
+			toast.error("Failed to create board.");
 		}
 	};
 	useEffect(() => () => reset(), []);

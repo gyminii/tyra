@@ -4,10 +4,7 @@ import {
 	CardActionArea,
 	CardContent,
 	Container,
-	MenuItem,
-	Select,
 	Stack,
-	Tabs,
 	Typography,
 	alpha,
 	lighten,
@@ -16,21 +13,16 @@ import {
 } from "@mui/material";
 import React from "react";
 // import Card from "../../card/card";
-import { useMutation, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { AddRounded } from "@mui/icons-material";
 import { DragDropContext } from "react-beautiful-dnd";
 
 // import {Board } from '../../board/board.jsx'
+import { GET_ALL_BOARDS } from "../../../server/graphql/board-queries";
 import { useDialog } from "../../hooks/use-dialog";
 import { CardAddActionDashed } from "../base/styles/card";
 import BoardWrapper from "../board/board-wrapper";
 import CreateBoardDialog from "../dialogs/create-board";
-import { GET_TASKS } from "../../../server/graphql/tasks-queries";
-import {
-	CREATE_BOARD,
-	GET_BOARDS,
-} from "../../../server/graphql/board-queries";
-import CreateTaskDialog from "../dialogs/create-task";
 
 const boards = ["to-do", "in-progress", "in-review", "done"];
 //  MUST CONTAIN ID, BOARD FOR BOARD SWAP LOGIC
@@ -38,10 +30,10 @@ const boards = ["to-do", "in-progress", "in-review", "done"];
 const Board = () => {
 	const theme = useTheme();
 	const mdUp = useMediaQuery(theme.breakpoints.up("md"));
-	const { data: boardObj, data } = useQuery(GET_BOARDS);
-	const boardArr = boardObj?.allBoards;
+	const { data: boardObj, data } = useQuery(GET_ALL_BOARDS);
+
+	const boardArr = boardObj?.getAllBoards;
 	const _board_dialog = useDialog();
-	console.log(data);
 	return (
 		<Box
 			display="flex"
@@ -62,7 +54,7 @@ const Board = () => {
 				sm: 3,
 			}}
 		>
-			<Container disableGutters={!mdUp} maxWidth={"xl"}>
+			{/* <Container disableGutters={!mdUp} maxWidth={"xl"}>
 				<Stack
 					spacing={0.5}
 					direction={{
@@ -90,7 +82,7 @@ const Board = () => {
 									},
 								}}
 							>
-								{/* <BaseButtonTab
+								<BaseButtonTab
 									componentType="tab"
 									label="React project migration"
 								/>
@@ -98,7 +90,7 @@ const Board = () => {
 									componentType="tab"
 									label="Engineering meeting"
 								/>
-								<BaseButtonTab componentType="tab" label="Marketing campaign" /> */}
+								<BaseButtonTab componentType="tab" label="Marketing campaign" />
 							</Tabs>
 						</>
 					) : (
@@ -109,7 +101,7 @@ const Board = () => {
 						</Select>
 					)}
 				</Stack>
-			</Container>
+			</Container> */}
 			<Card
 				elevation={0}
 				variant="outlined"
@@ -189,60 +181,18 @@ const Board = () => {
 											</CardContent>
 										</CardActionArea>
 									</CardAddActionDashed>
-									<CreateBoardDialog
-										open={_board_dialog.open}
-										onClose={_board_dialog.handleClose}
-									/>
+									{_board_dialog.open && (
+										<CreateBoardDialog
+											open={_board_dialog.open}
+											onClose={_board_dialog.handleClose}
+										/>
+									)}
 								</Box>
 							</DragDropContext>
 						</Box>
 					</Container>
 				</Box>
 			</Card>
-			{/* <MuiCard sx={{ marginBottom: 2 }}>
-				<CardContent sx={{ gap: 2 }}>
-					<Box width="100%" display="inline-flex" alignItems="center">
-						<Box flex={1}>
-							<Breadcrumbs separator="›" aria-label="breadcrumb">
-								<Typography>board</Typography>
-								<Typography variant="subtitle1">Tyra Personal</Typography>
-							</Breadcrumbs>
-						</Box>
-						<Box display="inline-flex">
-							<Box>
-								<IconButton>
-									<Schedule fontSize="small" />
-								</IconButton>
-								<Typography variant="subtitle3">10 Days left</Typography>
-							</Box>
-							<Divider flexItem orientation="vertical" sx={{ my: 1, px: 1 }} />
-							<IconButton>
-								<StarBorder fontSize="small" />
-							</IconButton>
-
-							<IconButton>
-								<Fullscreen fontSize="small" />
-							</IconButton>
-						</Box>
-					</Box>
-
-					<Box mt={2}>
-						<CardHeader
-							sx={{ p: 0 }}
-							title="Tyra Personal"
-							subheader="Feel free to add more tasks by clicking on the (+) button for each card."
-						/>
-					</Box>
-				</CardContent>
-			</MuiCard>
-
-			<Grid container gap={2} display="inline-flex">
-				{boardArr?.map((board, index) => (
-					<Grid item key={index}>
-						<Card board={board} />
-					</Grid>
-				))}
-			</Grid> */}
 		</Box>
 	);
 };

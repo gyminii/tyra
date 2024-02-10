@@ -1,30 +1,16 @@
-import { Schema, model } from "mongoose";
-import { v4 as uuidv4 } from "uuid";
+import mongoose, { Schema, model } from "mongoose";
 
-const TaskSchema = new Schema({
-	taskId: {
-		type: Schema.Types.UUID,
-		default: uuidv4,
-		unique: true,
-		required: true,
-	},
-	title: {
-		type: String,
-		required: true,
-	},
+export const TaskSchema = new mongoose.Schema({
+	title: String,
+	description: String,
+	dateCreated: String,
+	dueDate: String,
 	boardId: {
-		type: Schema.Types.UUID,
+		type: mongoose.Schema.Types.ObjectId,
 		ref: "Board",
+		required: false,
 	},
-	description: String,
-	dateCreated: {
-		type: Date,
-		required: true,
-		default: Date.now,
-	},
-	dateModified: Date,
-	description: String,
-	dueDate: Date,
+	isComplete: Boolean,
 });
 
 export default model("Task", TaskSchema);

@@ -12,6 +12,7 @@ import {
 	TextField,
 	Tooltip,
 	Typography,
+	useTheme,
 } from "@mui/material";
 import { useRef, useState } from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
@@ -23,45 +24,77 @@ import CreateTaskDialog from "../dialogs/create-task.jsx";
 import Task from "../task/task-wrapper.jsx";
 import { ButtonIcon } from "../inputs/button-icon.jsx";
 import { MoreHoriz } from "@mui/icons-material";
-// boardId, title, description
+import { useMutation } from "@apollo/client";
+import {
+	DELETE_BOARD,
+	GET_ALL_BOARDS,
+	UPDATE_BOARD,
+} from "../../../server/graphql/board-queries.js";
+import { GET_ALL_TASKS } from "../../../server/graphql/tasks-queries.js";
+import { Controller, useForm } from "react-hook-form";
+import { UPDATE_BOARD_VALIDATION } from "../../validation/board-validation.js";
+import { zodResolver } from "@hookform/resolvers/zod";
 const BoardWrapper = (props) => {
-	const { boardId, title, description, tasks } = { ...props };
-
-	const [name, setName] = useState(title);
+	const { _id, title, description, tasks } = { ...props };
+	const theme = useTheme();
+	const {
+		register,
+		formState: { errors, isValid },
+		handleSubmit,
+	} = useForm({
+		mode: "onBlur",
+		defaultValues: {
+			title: title,
+			description: "",
+		},
+		reValidateMode: "onChange",
+		resolver: zodResolver(UPDATE_BOARD_VALIDATION),
+	});
 	const [isRenaming, setRename] = useState(false);
-
 	const _task_dialog = useDialog();
 
+	const [deleteBoard] = useMutation(DELETE_BOARD);
+	const [updateBoard] = useMutation(UPDATE_BOARD);
 	const moreRef = useRef(null);
 	const [onMenuOpen, menuOpen] = useState(false);
 	const openMenu = () => menuOpen(true);
 	const closeMenu = () => menuOpen(false);
 
-	const handleChange = (event) => {
-		event.persist();
-		setName(event.target.value);
-	};
 	const handleRenameInit = () => {
 		setRename(true);
 	};
-	const handleRename = async () => {
+	const handleRename = async (body) => {
 		try {
-			if (!name) {
-				setName(title);
-				setRename(false);
-				return;
-			}
-			const update = {
-				name,
-			};
-			setRename(false);
-			// await dispatch(updateList(list.id, update));
+			const { updateBoard } = await updateBoard({
+				variables: {
+					_id: _id,
+					...body,
+				},
+				refetchQueries: [{ query: GET_ALL_BOARDS }],
+			});
 			toast.success("Project board updated successfully!");
+			setRename(false);
+			return updateBoard;
 		} catch (err) {
 			console.error(err);
 			toast.error("There was an error, try again later");
 		}
 	};
+	const deleteHandler = async () => {
+		try {
+			const response = await deleteBoard({
+				variables: {
+					_id: _id,
+				},
+				refetchQueries: [{ query: GET_ALL_BOARDS }, { query: GET_ALL_TASKS }],
+			});
+			closeMenu();
+			return response;
+		} catch (error) {
+			closeMenu();
+		}
+	};
+	console.log(errors, isValid);
 	return (
 		<CardBorderColor
 			elevation={7}
@@ -95,15 +128,25 @@ const BoardWrapper = (props) => {
 				alignItems="center"
 			>
 				{isRenaming ? (
-					<ClickAwayListener onClickAway={handleRename}>
+					<ClickAwayListener
+						onClickAway={() => {
+							if (!isValid) return;
+							setRename(false);
+						}}
+					>
 						<TextField
-							value={name}
+							{...register("title", {
+								required: true,
+								minLength: 1,
+								onBlur: handleSubmit(handleRename),
+								value: title,
+							})}
 							size="small"
-							onBlur={handleRename}
-							onChange={handleChange}
 							variant="outlined"
 							margin="none"
 							fullWidth
+							error={!!errors?.title}
+							helperText={errors?.title?.message}
 						/>
 					</ClickAwayListener>
 				) : (
@@ -160,7 +203,7 @@ const BoardWrapper = (props) => {
 					</Typography>
 				</Box>
 			)}
-			<Droppable droppableId={boardId}>
+			<Droppable droppableId={_id}>
 				{(provided) => (
 					<Stack
 						p={2}
@@ -226,15 +269,17 @@ const BoardWrapper = (props) => {
 						<ListItemText primary="Edit" onClick={handleRenameInit} />
 					</ListItemButton>
 					<ListItemButton>
-						<ListItemText primary="Delete" />
+						<ListItemText primary="Delete" onClick={deleteHandler} />
 					</ListItemButton>
 				</List>
 			</Menu>
-			<CreateTaskDialog
-				boardId={boardId}
-				open={_task_dialog.open}
-				onClose={_task_dialog.handleClose}
-			/>
+			{_task_dialog?.open && (
+				<CreateTaskDialog
+					boardId={_id}
+					open={_task_dialog.open}
+					onClose={_task_dialog.handleClose}
+				/>
+			)}
 		</CardBorderColor>
 	);
 };

@@ -1,65 +1,56 @@
 const typeDefs = `#graphql
 scalar Date
-# Graphql types
-# scalar date ID, String uuiv4, _id
-# CREATE INDEX
-#  ObjectID
+
 type Task {
-  taskId: ID! 
-  title: String
-  boardId: ID
+  _id: ID!
+  title: String!
   description: String
-  dateCreated: Date
-  dateModified: Date
-  dueDate: Date
-  # assignedTo: ID
+  dateCreated: String
+  dueDate: String
+  boardId: ID
+  isComplete: Boolean
 }
 
 type Board {
-  boardId: ID!
-  title: String
+  _id: ID!
+  title: String!
   description: String
-  dateCreated: Date
-  tasks: [Task]
+  dateCreated: String
+  dueDate: String
+  tasks: [Task]!
 }
 
 # POST - Creating Tasks
 input TaskBody {
-  taskId: ID!
   title: String!
-  boardId: ID!
-  dueDtate: Date
+  boardId: ID
+  description: String
+  dueDate: Date
   # assignedTo: ID  
 }
 input BoardBody {
-  boardId: ID!
   title: String!
   description: String
   dateCreated: Date
-  # tasks: [Task]
 }
 
 type Query {
-  # tasks
-  allTasks: [Task!]!
+  getAllTasks: [Task!]!
   getTask(taskId: ID!): Task
-  # boards
-  allBoards: [Board!]!
-  getBoard(boardId: ID!): Board
-
-
+  getAllBoards: [Board!]!
+  getBoard(_id: ID!): Board
 }
 
 type Mutation {
-  # tasks
-  createTask(task: TaskBody): Task!
-  deleteTask(taskId: ID!): Boolean
-  editTask(title: String!, board: String!, taskId: ID!): Boolean
-  # boards
-  createBoard(board: BoardBody): Board!
-  deleteBoard(boardId: ID!): Boolean
+  # Task mutations
+  createTask(title: String!, description: String, dueDate: String, boardId: ID, isComplete: Boolean): Task!
+  updateTask(_id: ID!, title: String, description: String, dueDate: String, boardId: ID, isComplete: Boolean): Task!
+  deleteTask(_id: ID!): Task
 
-
+  # Board mutations
+  createBoard(title: String!, description: String, dueDate: String): Board!
+  updateBoard(_id: ID!, title: String, description: String, dueDate: String): Board!
+  deleteBoard(_id: ID!): Board
 }
 `;
 export default typeDefs;

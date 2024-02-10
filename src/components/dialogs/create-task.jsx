@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import {
 	Box,
 	Button,
@@ -12,33 +12,61 @@ import {
 	Stack,
 	Typography,
 } from "@mui/material";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { GET_BOARD } from "../../../server/graphql/board-queries";
+import {
+	GET_ALL_BOARDS,
+	GET_BOARD,
+} from "../../../server/graphql/board-queries";
+import toast from "react-hot-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CREATE_TASK_VALIDATION } from "../../validation/task-validation";
+import { CREATE_TASK } from "../../../server/graphql/tasks-queries";
+import { v4 as uuidv4 } from "uuid";
 const Transition = forwardRef((props, ref) => (
 	<Slide direction="up" ref={ref} {...props} />
 ));
+
 const CreateTaskDialog = (props) => {
 	const { onClose, boardId } = props;
-	// const { loading, error, data } = useQuery(GET_BOARD, {
-	// 	variables: {
-	// 		boardId: boardId,
-	// 	},
-	// });
 
-	const { control, handleSubmit } = useForm({
+	const [createTask, { loading, error, data: task }] = useMutation(CREATE_TASK);
+
+	const {
+		control,
+		handleSubmit,
+		reset,
+		formState: { errors },
+	} = useForm({
 		mode: "onChange",
+		shouldFocusError: true,
+		resolver: zodResolver(CREATE_TASK_VALIDATION),
 		defaultValues: {
 			title: "",
-			boardId: boardId,
 			description: "",
+			dueDate: null,
 		},
 	});
-
 	const onSubmit = async (body) => {
-		console.log(body);
+		try {
+			const response = await createTask({
+				variables: {
+					title: body.title,
+					description: body.description,
+					boardId: boardId,
+				},
+				refetchQueries: [{ query: GET_ALL_BOARDS }],
+			});
+			toast.success("Project board updated successfully!");
+			onClose();
+			return response;
+		} catch (error) {
+			toast.error("Failed to create task.");
+		}
+		// onClose();
 	};
-	console.count();
+	console.log(toast);
+	useEffect(() => () => reset(), []);
 	return (
 		<Dialog
 			{...props}
@@ -84,11 +112,46 @@ const CreateTaskDialog = (props) => {
 										<Controller
 											control={control}
 											name="title"
+											rules={{ required: true }}
 											render={({ field }) => (
 												<OutlinedInput
 													{...field}
 													id="task-title-input"
 													fullWidth
+												/>
+											)}
+										/>
+									</Grid>
+								</Grid>
+							</FormControl>
+						</Grid>
+						<Grid item xs={12}>
+							<FormControl variant="outlined" fullWidth>
+								<Typography
+									variant="h6"
+									gutterBottom
+									component="label"
+									htmlFor="task-description-input"
+									fontWeight={500}
+								>
+									Description
+									<Typography variant="subtitle2" color="text.secondary">
+										Write a short description about the section
+									</Typography>
+								</Typography>
+								<Grid container spacing={{ xs: 2, md: 3 }}>
+									<Grid item xs={12}>
+										<Controller
+											control={control}
+											name="description"
+											render={({ field }) => (
+												<OutlinedInput
+													{...field}
+													id="task-description-input"
+													fullWidth
+													multiline
+													maxRows={6}
+													minRows={2}
 												/>
 											)}
 										/>
@@ -105,7 +168,13 @@ const CreateTaskDialog = (props) => {
 						}}
 						spacing={1}
 					>
-						<Button variant="outlined" color="secondary" autoFocus fullWidth>
+						<Button
+							variant="outlined"
+							color="secondary"
+							autoFocus
+							fullWidth
+							onClick={onClose}
+						>
 							Cancel
 						</Button>
 						<Button type="submit" variant="contained" autoFocus fullWidth>
