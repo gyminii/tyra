@@ -11,12 +11,15 @@ import clsx from "clsx";
 import React, { forwardRef, useRef, useState } from "react";
 import { ButtonIcon } from "../inputs/button-icon.jsx";
 import { MoreHorizTwoTone } from "@mui/icons-material";
+import { useDialog } from "../../hooks/use-dialog.js";
+import EditTaskDialog from "../dialogs/edit-task.jsx";
 const Task = forwardRef(({ task, dragging, ...props }, ref) => {
 	const { title, taskId, description, dateCreated } = task;
 	const moreRef = useRef(null);
 	const [onMenuOpen, menuOpen] = useState(false);
 	const openMenu = () => menuOpen(true);
 	const closeMenu = () => menuOpen(false);
+	const _edit_dialog = useDialog();
 	return (
 		<>
 			<Box key={taskId} ref={ref} {...props}>
@@ -84,10 +87,26 @@ const Task = forwardRef(({ task, dragging, ...props }, ref) => {
 					component="nav"
 				>
 					<ListItemButton>
+						<ListItemText
+							primary="Edit"
+							onClick={(e) => {
+								_edit_dialog.handleOpen();
+								closeMenu();
+							}}
+						/>
+					</ListItemButton>
+					<ListItemButton>
 						<ListItemText primary="Delete" />
 					</ListItemButton>
 				</List>
 			</Menu>
+			{_edit_dialog.open && (
+				<EditTaskDialog
+					task={task}
+					open={_edit_dialog.open}
+					onClose={_edit_dialog.handleClose}
+				/>
+			)}
 		</>
 	);
 });

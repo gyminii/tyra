@@ -23,6 +23,7 @@ import { useDialog } from "../../hooks/use-dialog";
 import { CardAddActionDashed } from "../base/styles/card";
 import BoardWrapper from "../board/board-wrapper";
 import CreateBoardDialog from "../dialogs/create-board";
+import { GET_ALL_TASKS } from "../../../server/graphql/tasks-queries";
 
 const boards = ["to-do", "in-progress", "in-review", "done"];
 //  MUST CONTAIN ID, BOARD FOR BOARD SWAP LOGIC
@@ -31,7 +32,8 @@ const Board = () => {
 	const theme = useTheme();
 	const mdUp = useMediaQuery(theme.breakpoints.up("md"));
 	const { data: boardObj, data } = useQuery(GET_ALL_BOARDS);
-
+	const { data: tasks } = useQuery(GET_ALL_TASKS);
+	console.log(tasks);
 	const boardArr = boardObj?.getAllBoards;
 	const _board_dialog = useDialog();
 	return (

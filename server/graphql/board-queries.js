@@ -32,6 +32,7 @@ export const GET_ALL_BOARDS = gql`
 			tasks {
 				_id
 				title
+				boardId
 				description
 				dateCreated
 				dueDate

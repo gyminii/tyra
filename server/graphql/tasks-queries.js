@@ -34,3 +34,30 @@ export const CREATE_TASK = gql`
 		}
 	}
 `;
+export const EDIT_TASK = gql`
+	mutation EditTask(
+		$_id: ID!
+		$title: String
+		$description: String
+		$dueDate: String
+		$boardId: ID
+		$isComplete: Boolean
+	) {
+		updateTask(
+			_id: $_id
+			title: $title
+			description: $description
+			dueDate: $dueDate
+			boardId: $boardId
+			isComplete: $isComplete
+		) {
+			_id
+			title
+			description
+			dateCreated
+			dueDate
+			boardId
+			isComplete
+		}
+	}
+`;

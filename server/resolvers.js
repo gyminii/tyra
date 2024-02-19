@@ -63,8 +63,17 @@ const resolvers = {
 				throw new Error("Failed to create task. Please try again later."); // Return a meaningful error message
 			}
 		},
-		updateTask: async (_, { taskId, ...args }) =>
-			await Task.findByIdAndUpdate(taskId, args, { new: true }),
+		updateTask: async (
+			_,
+			{ _id, title, description, dueDate, boardId, isComplete }
+		) => {
+			const updatedTask = await Task.findByIdAndUpdate(
+				_id,
+				{ title, description, dueDate, boardId, isComplete },
+				{ new: true }
+			);
+			return updatedTask;
+		},
 		deleteTask: async (_, { taskId }) => {
 			const deletedTask = await Task.findByIdAndDelete(taskId);
 			// Update board tasks array

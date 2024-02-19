@@ -65,7 +65,7 @@ const BoardWrapper = (props) => {
 	};
 	const handleRename = async (body) => {
 		try {
-			const { updateBoard } = await updateBoard({
+			const { updateBoard: updatedBoard } = await updateBoard({
 				variables: {
 					_id: _id,
 					...body,
@@ -74,7 +74,7 @@ const BoardWrapper = (props) => {
 			});
 			toast.success("Project board updated successfully!");
 			setRename(false);
-			return updateBoard;
+			return updatedBoard;
 		} catch (err) {
 			console.error(err);
 			toast.error("There was an error, try again later");
@@ -206,6 +206,7 @@ const BoardWrapper = (props) => {
 			<Droppable droppableId={_id}>
 				{(provided) => (
 					<Stack
+						key={_id}
 						p={2}
 						spacing={{
 							xs: 2,
