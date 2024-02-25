@@ -94,7 +94,6 @@ const BoardWrapper = (props) => {
 			closeMenu();
 		}
 	};
-	console.log(errors, isValid);
 	return (
 		<CardBorderColor
 			elevation={7}
@@ -218,11 +217,7 @@ const BoardWrapper = (props) => {
 						ref={provided.innerRef}
 					>
 						{tasks.map((task, index) => (
-							<Draggable
-								draggableId={task?.taskId}
-								index={index}
-								key={task?.taskId}
-							>
+							<Draggable draggableId={task?._id} index={index} key={task?._id}>
 								{(provided, snapshot) => (
 									<Task
 										index={index}

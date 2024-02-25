@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
 	Button,
 	CircularProgress,
@@ -8,7 +8,9 @@ import {
 	FormControl,
 	FormControlLabel,
 	Grid,
+	MenuItem,
 	OutlinedInput,
+	Select,
 	Slide,
 	Stack,
 	Switch,
@@ -28,9 +30,12 @@ const Transition = forwardRef((props, ref) => (
 
 const EditTaskDialog = ({ task, onClose, ...props }) => {
 	const [updateTask, { loading, error, data }] = useMutation(EDIT_TASK);
+	const {
+		data: { getAllBoards: boards },
+	} = useQuery(GET_ALL_BOARDS);
 	const [cleared, setCleared] = useState(false);
 	const spinner = useDelay(loading, 1500);
-
+	const client = useApolloClient();
 	const {
 		control,
 		handleSubmit,
@@ -45,6 +50,7 @@ const EditTaskDialog = ({ task, onClose, ...props }) => {
 			desription: task.description,
 			dueDate: task.dueDate,
 			isComplete: task.isComplete,
+			boardId: task.boardId,
 		},
 	});
 
@@ -57,11 +63,12 @@ const EditTaskDialog = ({ task, onClose, ...props }) => {
 	}, [cleared]);
 
 	useEffect(() => {
+		console.log(task);
 		reset(task);
 	}, [reset, task]);
-
+	console.log(client);
 	const onSubmit = async (body) => {
-		const { _id, title, description, dueDate } = body;
+		const { _id, title, description, dueDate, isComplete, boardId } = body;
 		try {
 			const response = await updateTask({
 				variables: {
@@ -69,10 +76,16 @@ const EditTaskDialog = ({ task, onClose, ...props }) => {
 					title: title,
 					description: description,
 					dueDate: dueDate,
+					isComplete: isComplete,
+					boardId: boardId,
 				},
-				refetchQueries: [{ query: GET_ALL_BOARDS }],
 			});
-			setTimeout(() => onClose(), 1500);
+			setTimeout(async () => {
+				await client.refetchQueries({
+					include: [GET_ALL_BOARDS],
+				});
+				onClose();
+			}, 500);
 			return response;
 		} catch (error) {
 			console.error("ERROR UPDATING TASK: ", error);
@@ -163,6 +176,39 @@ const EditTaskDialog = ({ task, onClose, ...props }) => {
 													maxRows={6}
 													minRows={2}
 												/>
+											)}
+										/>
+									</Grid>
+								</Grid>
+							</FormControl>
+						</Grid>
+						<Grid item xs={12}>
+							<FormControl variant="outlined" fullWidth>
+								<Typography
+									variant="h6"
+									gutterBottom
+									component="label"
+									htmlFor="board-input"
+									fontWeight={500}
+								>
+									Board
+									<Typography variant="subtitle2" color="text.secondary">
+										Assign Task to a board
+									</Typography>
+								</Typography>
+								<Grid container spacing={{ xs: 2, md: 3 }}>
+									<Grid item xs={12}>
+										<Controller
+											control={control}
+											name="boardId"
+											render={({ field }) => (
+												<Select {...field} fullWidth id="board-input">
+													{boards.map(({ title, _id }, index) => (
+														<MenuItem key={index} id={_id} value={_id}>
+															{title}
+														</MenuItem>
+													))}
+												</Select>
 											)}
 										/>
 									</Grid>

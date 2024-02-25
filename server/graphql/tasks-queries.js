@@ -3,9 +3,9 @@ import { gql } from "@apollo/client";
 export const GET_ALL_TASKS = gql`
 	query GetAllTasks {
 		getAllTasks {
-			_id
+			# _id
 			title
-			description
+			# description
 			boardId
 		}
 	}
@@ -31,6 +31,16 @@ export const CREATE_TASK = gql`
 			dueDate
 			boardId
 			isComplete
+		}
+	}
+`;
+export const REORDER_TASK = gql`
+	mutation reorderTask($boardId: ID!, $tasksOrder: [ID!]!) {
+		reorderTask(boardId: $boardId, tasksOrder: $tasksOrder) {
+			_id
+			title
+			order
+			# Include other fields you need
 		}
 	}
 `;

@@ -11,9 +11,9 @@ import {
 	useMediaQuery,
 	useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 // import Card from "../../card/card";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { AddRounded } from "@mui/icons-material";
 import { DragDropContext } from "react-beautiful-dnd";
 
@@ -23,7 +23,12 @@ import { useDialog } from "../../hooks/use-dialog";
 import { CardAddActionDashed } from "../base/styles/card";
 import BoardWrapper from "../board/board-wrapper";
 import CreateBoardDialog from "../dialogs/create-board";
-import { GET_ALL_TASKS } from "../../../server/graphql/tasks-queries";
+import {
+	EDIT_TASK,
+	GET_ALL_TASKS,
+	REORDER_TASK,
+} from "../../../server/graphql/tasks-queries";
+import toast from "react-hot-toast";
 
 const boards = ["to-do", "in-progress", "in-review", "done"];
 //  MUST CONTAIN ID, BOARD FOR BOARD SWAP LOGIC
@@ -32,10 +37,95 @@ const Board = () => {
 	const theme = useTheme();
 	const mdUp = useMediaQuery(theme.breakpoints.up("md"));
 	const { data: boardObj, data } = useQuery(GET_ALL_BOARDS);
-	const { data: tasks } = useQuery(GET_ALL_TASKS);
-	console.log(tasks);
+	const [updateTask] = useMutation(EDIT_TASK);
+	const [reorderTask] = useMutation(REORDER_TASK);
+	const [localBoards, setLocalBoards] = useState([]);
 	const boardArr = boardObj?.getAllBoards;
 	const _board_dialog = useDialog();
+	useEffect(() => {
+		if (boardArr) {
+			setLocalBoards(boardArr);
+		}
+	}, [boardArr]);
+	const onDragEnd = useCallback(
+		async (result) => {
+			const { source, destination, draggableId } = result;
+
+			if (
+				!destination ||
+				(source.droppableId === destination.droppableId &&
+					source.index === destination.index)
+			) {
+				return;
+			}
+
+			// Deep copy to ensure immutability
+			let newBoards = localBoards.map((board) => ({
+				...board,
+				tasks: board.tasks.map((task) => ({ ...task })),
+			}));
+
+			const sourceBoardIndex = newBoards.findIndex(
+				(board) => board._id === source.droppableId
+			);
+			const destinationBoardIndex =
+				source.droppableId === destination.droppableId
+					? sourceBoardIndex
+					: newBoards.findIndex(
+							(board) => board._id === destination.droppableId
+					  );
+
+			const sourceTasks = Array.from(newBoards[sourceBoardIndex].tasks);
+			const destinationTasks =
+				sourceBoardIndex === destinationBoardIndex
+					? sourceTasks
+					: Array.from(newBoards[destinationBoardIndex].tasks);
+
+			const [movedTask] = sourceTasks.splice(source.index, 1);
+			destinationTasks.splice(destination.index, 0, movedTask);
+
+			// Apply updates to the local boards state
+			newBoards[sourceBoardIndex].tasks = sourceTasks;
+			if (sourceBoardIndex !== destinationBoardIndex) {
+				newBoards[destinationBoardIndex].tasks = destinationTasks;
+			}
+
+			// Optimistically update local state
+			setLocalBoards(newBoards);
+
+			try {
+				if (sourceBoardIndex === destinationBoardIndex) {
+					// Reorder within the same board
+					await reorderTask({
+						variables: {
+							boardId: source.droppableId,
+							tasksOrder: sourceTasks.map((task) => task._id),
+						},
+					});
+					toast.success("Task reordered successfully.");
+				} else {
+					// Move to a different board
+					await updateTask({
+						variables: {
+							_id: draggableId,
+							boardId: destination.droppableId,
+						},
+					});
+					toast.success("Task moved successfully.");
+				}
+			} catch (error) {
+				console.error("Failed to update task: ", error);
+				toast.error(
+					`Failed to ${
+						sourceBoardIndex === destinationBoardIndex ? "reorder" : "move"
+					} task.`
+				);
+				// Optionally, roll back to the previous state if the mutation fails
+			}
+		},
+		[localBoards, reorderTask, updateTask]
+	);
+
 	return (
 		<Box
 			display="flex"
@@ -56,54 +146,6 @@ const Board = () => {
 				sm: 3,
 			}}
 		>
-			{/* <Container disableGutters={!mdUp} maxWidth={"xl"}>
-				<Stack
-					spacing={0.5}
-					direction={{
-						xs: "column",
-						md: "row",
-					}}
-					alignItems="center"
-					pb={{
-						xs: 2,
-						md: 0,
-					}}
-				>
-					{mdUp ? (
-						<>
-							<Tabs
-								// value={Number(value)}
-								// onChange={handleTabChange}
-								sx={{
-									overflow: "visible",
-									"& .MuiTabs-indicator": {
-										display: "none",
-									},
-									"& .MuiTabs-scroller": {
-										overflow: "visible !important",
-									},
-								}}
-							>
-								<BaseButtonTab
-									componentType="tab"
-									label="React project migration"
-								/>
-								<BaseButtonTab
-									componentType="tab"
-									label="Engineering meeting"
-								/>
-								<BaseButtonTab componentType="tab" label="Marketing campaign" />
-							</Tabs>
-						</>
-					) : (
-						<Select fullWidth>
-							<MenuItem value="0">React project migration</MenuItem>
-							<MenuItem value="1">Engineering meeting</MenuItem>
-							<MenuItem value="2">Marketing campaign</MenuItem>
-						</Select>
-					)}
-				</Stack>
-			</Container> */}
 			<Card
 				elevation={0}
 				variant="outlined"
@@ -139,7 +181,7 @@ const Board = () => {
 							}}
 						>
 							{/* onDragEnd={handleDragEnd} */}
-							<DragDropContext>
+							<DragDropContext onDragEnd={onDragEnd}>
 								<Box
 									display="flex"
 									flexDirection={{
@@ -151,8 +193,8 @@ const Board = () => {
 										overflowY: "hidden",
 									}}
 								>
-									{boardArr?.map((item, index) => (
-										<BoardWrapper {...item} key={index} />
+									{localBoards?.map((item, index) => (
+										<BoardWrapper {...item} key={item?._id || index} />
 									))}
 									<CardAddActionDashed
 										variant="outlined"

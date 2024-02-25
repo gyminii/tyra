@@ -15,17 +15,25 @@ const resolvers = {
 		getTask: async (_, { taskId }) => await Task.findById(taskId),
 		getAllBoards: async () => {
 			try {
+				// Fetch all boards
 				const boards = await Board.find();
-				const tasks = await Task.find();
+				// Fetch all tasks
+				const tasks = await Task.find().sort({ order: 1 });
 
-				return boards.map((board) => ({
-					...board.toObject(),
-					tasks: tasks.filter((task) =>
-						task.boardId
-							? task.boardId.toString() === board._id.toString()
-							: !task.boardId
-					),
-				}));
+				// Map through each board to attach the related tasks
+				return boards.map((board) => {
+					// Convert Mongoose document to a plain JavaScript object
+					const boardObj = board.toObject();
+
+					// Filter tasks that have a matching boardId with the current board's _id
+					boardObj.tasks = tasks.filter((task) => {
+						return (
+							task.boardId && task.boardId.toString() === board._id.toString()
+						);
+					});
+
+					return boardObj;
+				});
 			} catch (error) {
 				console.error("Error fetching boards:", error);
 				throw new Error("Failed to fetch boards. Please try again later.");
@@ -62,6 +70,20 @@ const resolvers = {
 				console.error("Error creating task:", error);
 				throw new Error("Failed to create task. Please try again later."); // Return a meaningful error message
 			}
+		},
+		reorderTask: async (_, { boardId, tasksOrder }) => {
+			const bulkOps = tasksOrder.map((taskId, index) => ({
+				updateOne: {
+					filter: { _id: taskId, boardId },
+					update: { $set: { order: index } },
+				},
+			}));
+
+			await Task.bulkWrite(bulkOps);
+
+			// Fetch and return the updated tasks in their new order
+			const updatedTasks = await Task.find({ boardId }).sort("order");
+			return updatedTasks;
 		},
 		updateTask: async (
 			_,

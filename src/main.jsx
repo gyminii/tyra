@@ -4,6 +4,7 @@ import { ThemeProvider } from "./theme/theme.jsx";
 import { Suspense } from "react";
 import { ApolloProvider } from "./server/apollo-client.jsx";
 import { SettingsProvider } from "./theme/settings.jsx";
+import { Toaster } from "react-hot-toast";
 const root = createRoot(document.getElementById("root"));
 
 root.render(
@@ -11,6 +12,7 @@ root.render(
 		<SettingsProvider>
 			<ThemeProvider>
 				<Suspense>
+					<Toaster />
 					<App />
 				</Suspense>
 			</ThemeProvider>

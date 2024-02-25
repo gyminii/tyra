@@ -31,6 +31,7 @@ export const GET_ALL_BOARDS = gql`
 			dueDate
 			tasks {
 				_id
+				order
 				title
 				boardId
 				description

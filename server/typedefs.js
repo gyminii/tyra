@@ -9,6 +9,7 @@ type Task {
   dueDate: String
   boardId: ID
   isComplete: Boolean
+  order: Int
 }
 
 type Board {
@@ -46,6 +47,7 @@ type Mutation {
   createTask(title: String!, description: String, dueDate: String, boardId: ID, isComplete: Boolean): Task!
   updateTask(_id: ID!, title: String, description: String, dueDate: String, boardId: ID, isComplete: Boolean): Task!
   deleteTask(_id: ID!): Task
+  reorderTask(boardId: ID!, tasksOrder: [ID!]!): [Task!]!
 
   # Board mutations
   createBoard(title: String!, description: String, dueDate: String): Board!

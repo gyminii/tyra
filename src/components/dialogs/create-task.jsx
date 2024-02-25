@@ -7,7 +7,9 @@ import {
 	DialogTitle,
 	FormControl,
 	Grid,
+	MenuItem,
 	OutlinedInput,
+	Select,
 	Slide,
 	Stack,
 	Typography,
@@ -31,7 +33,10 @@ const CreateTaskDialog = (props) => {
 	const { onClose, boardId } = props;
 
 	const [createTask, { loading, error, data: task }] = useMutation(CREATE_TASK);
-
+	const {
+		data: { getAllBoards: boards },
+	} = useQuery(GET_ALL_BOARDS);
+	console.log(boards);
 	const {
 		control,
 		handleSubmit,
@@ -45,6 +50,7 @@ const CreateTaskDialog = (props) => {
 			title: "",
 			description: "",
 			dueDate: null,
+			boardId: null,
 		},
 	});
 	const onSubmit = async (body) => {
@@ -65,7 +71,6 @@ const CreateTaskDialog = (props) => {
 		}
 		// onClose();
 	};
-	console.log(toast);
 	useEffect(() => () => reset(), []);
 	return (
 		<Dialog
@@ -153,6 +158,39 @@ const CreateTaskDialog = (props) => {
 													maxRows={6}
 													minRows={2}
 												/>
+											)}
+										/>
+									</Grid>
+								</Grid>
+							</FormControl>
+						</Grid>
+						<Grid item xs={12}>
+							<FormControl variant="outlined" fullWidth>
+								<Typography
+									variant="h6"
+									gutterBottom
+									component="label"
+									htmlFor="task-description-input"
+									fontWeight={500}
+								>
+									Board
+									<Typography variant="subtitle2" color="text.secondary">
+										Assign task to a board
+									</Typography>
+								</Typography>
+								<Grid container spacing={{ xs: 2, md: 3 }}>
+									<Grid item xs={12}>
+										<Controller
+											control={control}
+											name="boardId"
+											render={({ field }) => (
+												<Select fullWidth {...field}>
+													{boards?.map(({ title, _id }, index) => (
+														<MenuItem key={index} id={_id} value={_id}>
+															{title}
+														</MenuItem>
+													))}
+												</Select>
 											)}
 										/>
 									</Grid>
