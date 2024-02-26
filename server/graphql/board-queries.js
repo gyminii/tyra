@@ -62,17 +62,27 @@ export const UPDATE_BOARD = gql`
 		$title: String
 		$description: String
 		$dueDate: String
+		$tasks: [TaskBody]
 	) {
 		updateBoard(
 			_id: $_id
 			title: $title
 			description: $description
 			dueDate: $dueDate
+			tasks: $tasks
 		) {
 			_id
 			title
 			description
 			dueDate
+			tasks {
+				title
+				description
+				dateCreated
+				dueDate
+				isComplete
+				order
+			}
 		}
 	}
 `;

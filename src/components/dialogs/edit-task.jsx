@@ -24,6 +24,7 @@ import { Controller, useForm } from "react-hook-form";
 import { GET_ALL_BOARDS } from "../../../server/graphql/board-queries";
 import { EDIT_TASK } from "../../../server/graphql/tasks-queries";
 import useDelay from "../../hooks/use-delay";
+import toast from "react-hot-toast";
 const Transition = forwardRef((props, ref) => (
 	<Slide direction="up" ref={ref} {...props} />
 ));
@@ -84,6 +85,7 @@ const EditTaskDialog = ({ task, onClose, ...props }) => {
 				await client.refetchQueries({
 					include: [GET_ALL_BOARDS],
 				});
+				toast.success("Task edited successfully.");
 				onClose();
 			}, 500);
 			return response;

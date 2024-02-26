@@ -27,6 +27,7 @@ input TaskBody {
   boardId: ID
   description: String
   dueDate: Date
+  order: Int
   # assignedTo: ID  
 }
 input BoardBody {
@@ -51,7 +52,7 @@ type Mutation {
 
   # Board mutations
   createBoard(title: String!, description: String, dueDate: String): Board!
-  updateBoard(_id: ID!, title: String, description: String, dueDate: String): Board!
+  updateBoard(_id: ID!, title: String, description: String, dueDate: String, tasks: [TaskBody]): Board!
   deleteBoard(_id: ID!): Board
 }
 `;

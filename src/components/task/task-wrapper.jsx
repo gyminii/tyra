@@ -8,7 +8,7 @@ import {
 	Typography,
 } from "@mui/material";
 import clsx from "clsx";
-import React, { forwardRef, useRef, useState } from "react";
+import React, { forwardRef, memo, useRef, useState } from "react";
 import { ButtonIcon } from "../inputs/button-icon.jsx";
 import { MoreHorizTwoTone } from "@mui/icons-material";
 import { useDialog } from "../../hooks/use-dialog.js";
@@ -111,4 +111,4 @@ const Task = forwardRef(({ task, dragging, ...props }, ref) => {
 	);
 });
 
-export default Task;
+export default memo(Task);

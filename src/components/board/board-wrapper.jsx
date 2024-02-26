@@ -14,7 +14,7 @@ import {
 	Typography,
 	useTheme,
 } from "@mui/material";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 import toast from "react-hot-toast";
 
@@ -35,7 +35,7 @@ import { Controller, useForm } from "react-hook-form";
 import { UPDATE_BOARD_VALIDATION } from "../../validation/board-validation.js";
 import { zodResolver } from "@hookform/resolvers/zod";
 const BoardWrapper = (props) => {
-	const { _id, title, description, tasks } = { ...props };
+	const { _id, title, description, tasks, provided } = { ...props };
 	const theme = useTheme();
 	const {
 		register,
@@ -96,6 +96,9 @@ const BoardWrapper = (props) => {
 	};
 	return (
 		<CardBorderColor
+			ref={provided.innerRef}
+			{...provided.draggableProps}
+			{...provided.dragHandleProps}
 			elevation={7}
 			// borderColor={'black'}
 			borderPosition="top"
@@ -202,7 +205,7 @@ const BoardWrapper = (props) => {
 					</Typography>
 				</Box>
 			)}
-			<Droppable droppableId={_id}>
+			<Droppable droppableId={_id} type="task">
 				{(provided) => (
 					<Stack
 						key={_id}
@@ -280,4 +283,4 @@ const BoardWrapper = (props) => {
 	);
 };
 
-export default BoardWrapper;
+export default memo(BoardWrapper);

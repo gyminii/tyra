@@ -4,6 +4,7 @@ import BoardService from "./services/board/board-service.js";
 import Handler from "./services/handler-service.js";
 import Board from "./models/Board.js";
 import Task from "./models/Task.js";
+import mongoose from "mongoose";
 
 const taskService = new TaskService();
 const boardService = new BoardService();
@@ -17,23 +18,24 @@ const resolvers = {
 			try {
 				// Fetch all boards
 				const boards = await Board.find();
-				// Fetch all tasks
+
+				// Fetch all tasks and sort them by 'order' in ascending order
 				const tasks = await Task.find().sort({ order: 1 });
 
-				// Map through each board to attach the related tasks
-				return boards.map((board) => {
-					// Convert Mongoose document to a plain JavaScript object
+				// Map through each board to attach the related sorted tasks
+				const boardsWithSortedTasks = boards.map((board) => {
 					const boardObj = board.toObject();
 
-					// Filter tasks that have a matching boardId with the current board's _id
-					boardObj.tasks = tasks.filter((task) => {
-						return (
+					// Filter tasks that belong to the current board and are already sorted by 'order'
+					boardObj.tasks = tasks.filter(
+						(task) =>
 							task.boardId && task.boardId.toString() === board._id.toString()
-						);
-					});
+					);
 
 					return boardObj;
 				});
+
+				return boardsWithSortedTasks;
 			} catch (error) {
 				console.error("Error fetching boards:", error);
 				throw new Error("Failed to fetch boards. Please try again later.");
@@ -103,22 +105,57 @@ const resolvers = {
 			return deletedTask;
 		},
 		createBoard: async (_, args) => await Board.create(args),
-		updateBoard: async (_, { _id, title, description, dueDate }) => {
+		updateBoard: async (_, { _id, title, description, dueDate, tasks }) => {
 			try {
+				// Start a session for transaction
+				const session = await mongoose.startSession();
+				session.startTransaction();
+
+				const options = { session, new: true };
+
 				// Find the board by its ID and update its properties
 				const updatedBoard = await Board.findByIdAndUpdate(
 					_id,
 					{ title, description, dueDate },
-					{ new: true }
+					options
 				);
 
 				if (!updatedBoard) {
 					throw new Error("Board not found");
 				}
 
-				return updatedBoard;
+				// If tasks are provided, process them
+				if (tasks && tasks.length > 0) {
+					await Promise.all(
+						tasks.map(async (task) => {
+							if (task._id) {
+								// Update existing task
+								await Task.findByIdAndUpdate(task._id, task, options);
+							} else {
+								// Create new task and associate with this board
+								const newTask = new Task({ ...task, boardId: _id });
+								await newTask.save(options);
+							}
+						})
+					);
+				}
+
+				// Commit transaction
+				await session.commitTransaction();
+				session.endSession();
+
+				// To return the updated board with tasks, you might need to query the board again
+				// as the tasks array in updatedBoard won't include the changes made above
+				const boardWithUpdatedTasks = await Board.findById(_id).populate(
+					"tasks"
+				);
+
+				return boardWithUpdatedTasks;
 			} catch (error) {
 				console.error("Error updating board:", error);
+				// If an error occurs, abort the transaction
+				session.abortTransaction();
+				session.endSession();
 				throw new Error("Failed to update board. Please try again later.");
 			}
 		},
