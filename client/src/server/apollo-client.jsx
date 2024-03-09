@@ -5,8 +5,12 @@ import {
 } from "@apollo/client";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 export const ApolloProvider = ({ children }) => {
+	const graphqlUri =
+		process.env.NODE_ENV === "production"
+			? "https://tyra-production.up.railway.app/" // Production URI
+			: "http://localhost:5000/";
 	const client = new ApolloClient({
-		uri: "http://localhost:5000/",
+		uri: graphqlUri,
 		cache: new InMemoryCache(),
 	});
 	if (process.env.NODE_ENV !== "production") {
