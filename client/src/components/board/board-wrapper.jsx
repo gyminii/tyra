@@ -36,11 +36,19 @@ import {
 } from "../../graphql/board.js";
 import { GET_ALL_TASKS } from "../../graphql/task.js";
 import { useDispatch, useSelector } from "../../redux/store/index.js";
-import { editBoard } from "../../redux/slice/board.js";
+import {
+	editBoard,
+	restoreBoard,
+	deleteBoard as deleteSlice,
+} from "../../redux/slice/board.js";
 
 const tasksSelector = (state, boardId) => {
 	const { tasks } = state.tyra;
 	return tasks.byId[boardId];
+};
+const boardSelector = (state, boardId) => {
+	const { boards } = state.tyra;
+	return boards.byId[boardId];
 };
 const BoardWrapper = (props) => {
 	const { _id, title, description, provided } = { ...props };
@@ -48,6 +56,7 @@ const BoardWrapper = (props) => {
 	const dispatch = useDispatch();
 	const _task_dialog = useDialog();
 	const _tasks = useSelector((state) => tasksSelector(state, _id));
+	const _board = useSelector((state) => boardSelector(state, _id));
 	const tasks = useMemo(
 		() => (_tasks ? [..._tasks]?.sort((a, b) => a.order - b.order) : []),
 		[_tasks]
@@ -91,16 +100,19 @@ const BoardWrapper = (props) => {
 		}
 	};
 	const deleteHandler = async () => {
+		dispatch(deleteSlice(_id));
 		try {
 			const response = await deleteBoard({
 				variables: {
 					_id: _id,
 				},
-				refetchQueries: [{ query: GET_ALL_BOARDS }, { query: GET_ALL_TASKS }],
 			});
+			toast.success("Board Deleted Successfully");
 			closeMenu();
 			return response;
 		} catch (error) {
+			toast.error("Failed to delete Board.");
+			dispatch(restoreBoard(_board));
 			closeMenu();
 		}
 	};

@@ -152,6 +152,29 @@ const slice = createSlice({
 				state.tasks.byId[destinationBoardId] = destination;
 			}
 		},
+		// Optimistic ui update when fetch call fails.
+		restoreBoard: (state, action) => {
+			const board = action.payload;
+			if (!state.boards.byId[board._id]) {
+				state.boards.byId[board._id] = board;
+				state.boards.allIds.push(board._id);
+				state.boards.boards.push(board);
+			}
+		},
+		// Optimistic ui update when fetch call fails.
+		restoreTask: (state, action) => {
+			const { task, boardId } = action.payload;
+			// Ensure the board exists for this task
+			if (!state.tasks.byId[boardId]) {
+				state.tasks.byId[boardId] = [];
+			}
+			// Restore the task to the byId mapping under its board
+			state.tasks.byId[boardId].push(task);
+			// Restore the task to the tasks object
+			state.tasks.tasks[task._id] = task;
+			// Restore the task ID to the allIds list
+			state.tasks.allIds.push(task._id);
+		},
 	},
 });
 
@@ -166,12 +189,7 @@ export const {
 	addBoard,
 	editBoard,
 	deleteBoard,
+	restoreBoard,
+	deleteTask,
+	restoreTask,
 } = slice.actions;
-
-// // Update the state to reflect these changes
-// if (sourceBoardId === destinationBoardId) {
-// 	state.tasks.byId[sourceBoardId] = sourceTasks;
-// } else {
-// 	state.tasks.byId[sourceBoardId] = sourceTasks;
-// 	state.tasks.byId[destinationBoardId] = destinationTasks;
-// }

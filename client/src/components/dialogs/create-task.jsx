@@ -78,7 +78,6 @@ const CreateTaskDialog = (props) => {
 		} catch (error) {
 			toast.error("Failed to create task.");
 		}
-		// onClose();
 	};
 	useEffect(() => () => reset(), []);
 	return (
@@ -173,7 +172,7 @@ const CreateTaskDialog = (props) => {
 								</Grid>
 							</FormControl>
 						</Grid>
-						<Grid item xs={12}>
+						{/* <Grid item xs={12}>
 							<FormControl variant="outlined" fullWidth>
 								<Typography
 									variant="h6"
@@ -192,8 +191,8 @@ const CreateTaskDialog = (props) => {
 										<Controller
 											control={control}
 											name="boardId"
-											render={({ field }) => (
-												<Select fullWidth {...field}>
+											render={({ field: { onChange, value } }) => (
+												<Select fullWidth value={value} onChange={onChange}>
 													{boards?.map(({ title, _id }, index) => (
 														<MenuItem key={index} id={_id} value={_id}>
 															{title}
@@ -205,7 +204,7 @@ const CreateTaskDialog = (props) => {
 									</Grid>
 								</Grid>
 							</FormControl>
-						</Grid>
+						</Grid> */}
 					</Grid>
 					<Stack
 						mt={3}

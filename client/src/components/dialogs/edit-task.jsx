@@ -28,22 +28,22 @@ import { EDIT_TASK } from "../../graphql/task";
 import { GET_ALL_BOARDS } from "../../graphql/board";
 import { current } from "@reduxjs/toolkit";
 import { editTask } from "../../redux/slice/board";
+import { useDispatch } from "../../redux/store";
 const Transition = forwardRef((props, ref) => (
 	<Slide direction="up" ref={ref} {...props} />
 ));
 
 const EditTaskDialog = ({ task, onClose, ...props }) => {
-	const [updateTask, { loading, error, data }] = useMutation(EDIT_TASK, {
-		refetchQueries: [{ query: GET_ALL_BOARDS }],
-	});
+	const [updateTask, { loading, error, data }] = useMutation(EDIT_TASK);
 	const {
 		data: { getAllBoards: boards },
 	} = useQuery(GET_ALL_BOARDS);
+
+	const dispatch = useDispatch();
 	const [cleared, setCleared] = useState(false);
 	const spinner = useDelay(loading, 1500);
 	const client = useApolloClient();
 	const theme = useTheme();
-	console.log(boards);
 	const {
 		control,
 		handleSubmit,
