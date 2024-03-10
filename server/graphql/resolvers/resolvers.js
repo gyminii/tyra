@@ -26,13 +26,7 @@ const resolvers = {
 	Mutation: {
 		createTask: async (_, args) => {
 			try {
-				const newTask = await Task.create(args);
-
-				// if (args.boardId)
-				// 	await Board.findByIdAndUpdate(args.boardId, {
-				// 		$push: { tasks: newTask._id },
-				// 	});
-				return newTask;
+				return await Task.create(args);
 			} catch (error) {
 				console.error("Error creating task:", error);
 				throw new Error("Failed to create task. Please try again later."); // Return a meaningful error message
@@ -90,12 +84,7 @@ const resolvers = {
 			);
 			return updatedTask;
 		},
-		deleteTask: async (_, { taskId }) => {
-			const deletedTask = await Task.findByIdAndDelete(taskId);
-			// Update board tasks array
-			await Board.updateMany({ tasks: taskId }, { $pull: { tasks: taskId } });
-			return deletedTask;
-		},
+		deleteTask: async (_, { _id }) => await Task.findByIdAndDelete(_id),
 		createBoard: async (_, args) => await Board.create(args),
 		reorderBoard: async (_, { boardId, sourceIndex, destinationIndex }) => {
 			let boards = await Board.find({}).sort("order"); // Fetch all boards sorted by order
