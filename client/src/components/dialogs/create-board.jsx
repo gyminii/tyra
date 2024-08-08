@@ -197,7 +197,7 @@ const CreateBoardDialog = (props) => {
 							color="secondary"
 							autoFocus
 							fullWidth
-							// onClick={handleClose}
+							onClick={onClose}
 						>
 							Cancel
 						</Button>
