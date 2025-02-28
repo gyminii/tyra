@@ -5,8 +5,8 @@
 	"main": "index.js",
 	"type": "module",
 	"scripts": {
-		"start": "node server/config/index.js",
-		"dev": "nodemon server/config/index.js",
+		"start": "node config/index.js",
+		"dev": "nodemon config/index.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
@@ -21,6 +21,7 @@
 		"graphql-http": "^1.22.0",
 		"mongodb": "^6.4.0",
 		"mongoose": "^8.2.0",
-		"nodemon": "^3.1.0"
+		"nodemon": "^3.1.0",
+		"path": "^0.12.7"
 	}
 }
