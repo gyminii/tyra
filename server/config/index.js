@@ -8,7 +8,7 @@ import path from "path";
 
 dotenv.config({ path: path.resolve("../.env") });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
 const server = new ApolloServer({
 	typeDefs,
