@@ -30,7 +30,6 @@ const Task = forwardRef(({ task, dragging, ...props }, ref) => {
 	const { _id, title, taskId, description, dateCreated } = task;
 	const [deleteTask] = useMutation(DELETE_TASK);
 	const state = useSelector((state) => state);
-	console.log(state, task);
 	const _task = useSelector((state) => taskSelector(state, _id));
 	const moreRef = useRef(null);
 	const dispatch = useDispatch();
