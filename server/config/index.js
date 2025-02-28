@@ -1,15 +1,10 @@
-// import { ApolloServer } from "@apollo/server";
 import dotenv from "dotenv";
 import { connectDB } from "./db.js";
-
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { ApolloServer } from "@apollo/server";
 import typeDefs from "../graphql/typedef/typedefs.js";
 import resolvers from "../graphql/resolvers/resolvers.js";
-// import typeDefs from "./typedefs.js";
-// import resolvers from "./resolvers.js";
 
-// [type, type1, type2]
 dotenv.config();
 
 const port = process.env.PORT || 5000;
