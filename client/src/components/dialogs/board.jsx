@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -20,22 +20,33 @@ import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { CREATE_BOARD_VALIDATION } from "../../validation/board-validation";
-import { CREATE_BOARD, GET_ALL_BOARDS } from "../../graphql/board";
+import { CREATE_BOARD, GET_ALL_BOARDS, GET_BOARD } from "../../graphql/board";
 import { useDispatch } from "../../redux/store";
 import { addBoard, editBoard } from "../../redux/slice/board";
+import { useNavigate, useParams } from "react-router-dom";
 const Transition = forwardRef((props, ref) => (
 	<Slide direction="up" ref={ref} {...props} />
 ));
-const CreateBoardDialog = (props) => {
-	const { onClose } = props;
+const CreateBoardDialog = () => {
 	const theme = useTheme();
+	const { boardId, method } = useParams();
 	const dispatch = useDispatch();
-	const [createBoard, { loading, error, data: board }] =
-		useMutation(CREATE_BOARD);
+	const navigate = useNavigate();
+	const [createBoard] = useMutation(CREATE_BOARD, {
+		refetchQueries: [
+			{
+				query: GET_ALL_BOARDS,
+			},
+		],
+		awaitRefetchQueries: true,
+	});
+	const onClose = () => navigate("/");
+
 	const {
 		control,
 		handleSubmit,
 		reset,
+		watch,
 		formState: { errors },
 	} = useForm({
 		mode: "onChange",
@@ -44,40 +55,50 @@ const CreateBoardDialog = (props) => {
 		defaultValues: {
 			title: "",
 			description: "",
+			dateCreated: new Date().toISOString(),
 		},
 	});
+
+	const { data } = useQuery(GET_BOARD, {
+		variables: { _id: boardId },
+		skip: !boardId,
+	});
+	const board = data?.data;
+	console.log(board);
+	useEffect(() => {
+		if (!data) return;
+		reset({
+			title: board.title,
+			description: board.description,
+		});
+	}, [board]);
 	const onSubmit = async (body) => {
 		// const {title, description} = body
 		const optimisticBoardId = Date.now().toString();
 		const optimisticBoard = {
 			_id: optimisticBoardId,
-			...body,
+			...watch(),
 		};
 		dispatch(addBoard(optimisticBoard));
 		try {
 			const response = await createBoard({
 				variables: {
-					...body,
+					...watch(),
 				},
 			});
 			toast.success("Board created successfully.");
-			dispatch(
-				editBoard({
-					_id: optimisticBoardId,
-					updates: response.data.createBoard,
-				})
-			);
 			onClose();
+
 			return response;
 		} catch (error) {
 			console.log(error);
 			toast.error("Failed to create board.", error);
 		}
 	};
-	useEffect(() => () => reset(), []);
 	return (
 		<Dialog
-			{...props}
+			open={Boolean(boardId)}
+			onClose={onClose}
 			TransitionComponent={Transition}
 			fullWidth
 			sx={{
@@ -92,7 +113,8 @@ const CreateBoardDialog = (props) => {
 			<DialogTitle>
 				<Box>
 					<Typography variant="h3" fontWeight={600}>
-						Create Board
+						{method === "create" && "Create Board"}
+						{method === "edit" && "Edit Board"}
 					</Typography>
 				</Box>
 			</DialogTitle>

@@ -41,6 +41,7 @@ import {
 	restoreBoard,
 	deleteBoard as deleteSlice,
 } from "../../redux/slice/board.js";
+import { useNavigate } from "react-router-dom";
 
 const tasksSelector = (state, boardId) => {
 	const { tasks } = state.tyra;
@@ -74,6 +75,7 @@ const BoardWrapper = (props) => {
 		reValidateMode: "onChange",
 		resolver: zodResolver(UPDATE_BOARD_VALIDATION),
 	});
+	const navigate = useNavigate();
 	const [isRenaming, setRename] = useState(false);
 	const [deleteBoard] = useMutation(DELETE_BOARD);
 	const [updateBoard] = useMutation(UPDATE_BOARD);
@@ -287,7 +289,12 @@ const BoardWrapper = (props) => {
 					component="nav"
 				>
 					<ListItemButton>
-						<ListItemText primary="Edit" onClick={handleRenameInit} />
+						<ListItemText
+							primary="Edit"
+							onClick={() => {
+								navigate(`/${_id}/edit`);
+							}}
+						/>
 					</ListItemButton>
 					<ListItemButton>
 						<ListItemText primary="Delete" onClick={deleteHandler} />

@@ -19,6 +19,7 @@ const slice = createSlice({
 	reducers: {
 		addBoard: (state, action) => {
 			const newBoard = action.payload;
+			console.log("setting new board");
 			state.boards.byId[newBoard._id] = newBoard;
 			state.boards.allIds.push(newBoard._id);
 			state.boards.boards.push(newBoard);
@@ -92,6 +93,7 @@ const slice = createSlice({
 		setBoards: (state, action) => {
 			const boards = action.payload;
 			// Assuming boards is an array of board objects
+			console.log("EDiting board;");
 			state.boards.byId = boards.reduce((acc, board) => {
 				acc[board._id] = board;
 				return acc;

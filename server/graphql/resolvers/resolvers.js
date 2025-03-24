@@ -29,10 +29,9 @@ const resolvers = {
 				return await Task.create(args);
 			} catch (error) {
 				console.error("Error creating task:", error);
-				throw new Error("Failed to create task. Please try again later."); // Return a meaningful error message
+				throw new Error("Failed to create task. Please try again later.");
 			}
 		},
-
 		reorderTask: async (
 			_,
 			{

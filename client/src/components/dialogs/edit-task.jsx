@@ -17,16 +17,13 @@ import {
 	Typography,
 	useTheme,
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
-import moment from "moment";
 import React, { forwardRef, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import useDelay from "../../hooks/use-delay";
 import toast from "react-hot-toast";
-import { EDIT_TASK } from "../../graphql/task";
 import { GET_ALL_BOARDS } from "../../graphql/board";
-import { current } from "@reduxjs/toolkit";
+import { EDIT_TASK } from "../../graphql/task";
+import useDelay from "../../hooks/use-delay";
 import { editTask } from "../../redux/slice/board";
 import { useDispatch } from "../../redux/store";
 const Transition = forwardRef((props, ref) => (
@@ -73,8 +70,14 @@ const EditTaskDialog = ({ task, onClose, ...props }) => {
 	useEffect(() => {
 		reset(task);
 	}, [reset, task]);
-	const onSubmit = async (body) => {
-		const { _id, title, description, dueDate, isComplete, boardId } = body;
+	const onSubmit = async ({
+		_id,
+		title,
+		description,
+		dueDate,
+		isComplete,
+		boardId,
+	}) => {
 		dispatch(
 			editTask({
 				_id,

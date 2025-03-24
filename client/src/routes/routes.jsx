@@ -1,12 +1,8 @@
-import {
-	Outlet,
-	Route,
-	createBrowserRouter,
-	createRoutesFromElements,
-} from "react-router-dom";
-import Home from "../layouts/home";
 import { Suspense, lazy } from "react";
+import { Outlet, createBrowserRouter } from "react-router-dom";
+import Home from "../layouts/home";
 
+export const BoardDialog = lazy(() => import("../components/dialogs/board"));
 export const BoardComponent = lazy(() =>
 	import("../components/contents/board")
 );
@@ -27,6 +23,7 @@ const routes = [
 			{ element: <BoardComponent />, index: true },
 			// { path: "board", element: <BoardComponent /> },
 			{ path: "user", element: <UserComponent /> },
+			{ path: ":boardId/:method", element: <BoardDialog /> },
 		],
 	},
 ];

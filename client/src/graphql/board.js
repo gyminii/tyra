@@ -38,9 +38,10 @@ export const GET_ALL_BOARDS = gql`
  */
 export const GET_BOARD = gql`
 	query getBoard($_id: ID!) {
-		getBoard(_id: $_id) {
+		data: getBoard(_id: $_id) {
 			_id
 			title
+			description
 		}
 	}
 `;
