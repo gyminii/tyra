@@ -12,26 +12,6 @@ Welcome to the Tyra Kanban Board! A dynamic, interactive Kanban board built with
 - **MongoDB Backend**: Robust and scalable NoSQL database to handle all your data persistence needs, ensuring fast and secure access to your tasks.
 - **Deployed on Railway**: Effortlessly deployed with Railway, enjoy simple, scalable, and speedy deployments right out of the box.
 
-## Prerequisites 🔑
-
-Before you begin, ensure you have the following installed:
-
-- Node.js (latest stable version)
-- Git
-
-## Getting Started 🏁
-
-To get a local copy up and running, follow the steps below.
-
-1. Clone the repo: https://github.com/gyminii/tyra.git
-2. npm install
-3. To start the app
-   - Locally
-     - npm run dev
-   - Production build
-     1. npm run build
-     2. npm run start
-
 ## Contributing 🤝
 
 New Ideas are always welcome. If you have suggestions for how Tyra Kanban Board could be improved, please fork the repo and create a pull request. You can also open an issue with the tag "enhancement".
@@ -39,4 +19,4 @@ New Ideas are always welcome. If you have suggestions for how Tyra Kanban Board 
 ## Contact 📬
 
 - Tyler Lee - tyler7688@gmail.com
-- Portfolio - https://gyminii.github.io/
+- Portfolio - https://www.minii.dev/
